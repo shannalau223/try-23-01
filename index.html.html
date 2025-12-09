@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>屎忽 & 豬豬的首爾之旅</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&family=Zen+Maru+Gothic:wght@500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #FFB7C5; /* 櫻花粉 */
+            --secondary: #FFF0F5; /* 淺粉背景 */
+            --text: #5D5D5D; /* 深灰 */
+            --accent: #E5989B; /* 深粉紅 */
+            --white: #FFFFFF;
+            --gray-light: #F2F2F2;
+            --shadow: 0 4px 12px rgba(255, 183, 197, 0.25);
+            --completed-color: #BDBDBD;
+        }
+
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        
+        body {
+            font-family: 'Zen Maru Gothic', 'Noto Sans TC', sans-serif;
+            background-color: var(--secondary);
+            color: var(--text);
+            margin: 0;
+            padding: 0;
+            padding-bottom: 80px; /* Space for bottom nav */
+            overflow-x: hidden;
+        }
+
+        /* Header */
+        header {
+            background: var(--white);
+            padding: 20px;
+            border-radius: 0 0 25px 25px;
+            box-shadow: var(--shadow);
+            text-align: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .profile-pic {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            border: 3px solid var(--primary);
+            margin: 0 auto 10px;
+            background-color: #eee;
+            background-image: url('https://placehold.co/150x150/FFB7C5/ffffff?text=LuLu'); /* 替換成Lulu豬圖片 */
+            background-size: cover;
+            background-position: center;
+        }
+
+        h1 { font-size: 1.2rem; margin: 0; color: var(--accent); }
+        p.subtitle { font-size: 0.8rem; margin: 5px 0 0; color: #888; }
+        /* 週年紀念標籤樣式 */
+        .anniversary-badge {
+            background: var(--accent);
+            color: white;
+            font-size: 0.7rem;
+            padding: 2px 8px;
+            border-radius: 10px;
+            display: inline-block;
+            margin-top: 5px;
+        }
+
+        /* Container */
+        .container { padding: 20px; }
+
+        /* Tabs */
+        .tabs { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 10px; scrollbar-width: none; }
+        .tabs::-webkit-scrollbar { display: none; }
+        .tab-btn {
+            background: var(--white);
+            border: none;
+            padding: 8px 16px;
+            border-radius: 20px;
+            color: var(--text);
+            font-size: 0.9rem;
+            white-space: nowrap;
+            transition: all 0.3s;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        .tab-btn.active { background: var(--primary); color: white; font-weight: bold; }
+
+        /* Weather Widget */
+        .weather-card {
+            background: linear-gradient(135deg, #a1c4fd 0%, #c2e9fb 100%);
+            color: white;
+            padding: 15px;
+            border-radius: 20px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .weather-info h3 { margin: 0; font-size: 1.1rem; }
+        .weather-info p { margin: 0; font-size: 0.8rem; opacity: 0.9; }
+        .weather-icon { font-size: 2rem; }
+
+        /* Itinerary List */
+        .itinerary-list { list-style: none; padding: 0; }
+        .itinerary-item {
+            background: var(--white);
+            padding: 15px;
+            border-radius: 15px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        
+        /* Completed Style */
+        .itinerary-item.completed {
+            background: #f0f0f0;
+            opacity: 0.7;
+        }
+        .itinerary-item.completed .details h3, 
+        .itinerary-item.completed .details p {
+            text-decoration: line-through;
+            color: var(--completed-color);
+        }
+
+        .checkbox-wrapper {
+            position: relative;
+        }
+        .custom-checkbox {
+            width: 24px;
+            height: 24px;
+            border: 2px solid var(--primary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .custom-checkbox.checked {
+            background: var(--primary);
+        }
+        .custom-checkbox.checked::after {
+            content: '✓';
+            color: white;
+            font-size: 14px;
+        }
+
+        .time { 
+            font-weight: bold; color: var(--accent); font-size: 0.9rem; min-width: 50px; 
+            display: flex; flex-direction: column; align-items: center;
+        }
+        .details { flex: 1; }
+        .details h3 { margin: 0 0 5px; font-size: 1rem; }
+        .details p { margin: 0; font-size: 0.8rem; color: #888; }
+        
+        .actions { display: flex; gap: 5px; }
+        .action-btn { background: none; border: none; font-size: 1.1rem; cursor: pointer; opacity: 0.5; }
+
+        /* Money Section */
+        .money-card {
+            background: var(--white);
+            padding: 20px;
+            border-radius: 20px;
+            box-shadow: var(--shadow);
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .input-group { display: flex; gap: 10px; margin-bottom: 10px; }
+        input, select {
+            width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 10px;
+            font-family: inherit; font-size: 1rem;
+        }
+        .btn-calc {
+            background: var(--primary); color: white; border: none; width: 100%; padding: 12px;
+            border-radius: 10px; font-weight: bold; margin-top: 10px; cursor: pointer;
+        }
+        .result-box {
+            margin-top: 20px; padding: 15px; background: var(--secondary); border-radius: 10px;
+        }
+        .exchange-rate { font-size: 0.75rem; color: #999; margin-top: 5px; }
+
+        /* Map Section */
+        .map-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .map-btn {
+            background: var(--white); padding: 20px; border-radius: 20px; text-align: center;
+            text-decoration: none; color: var(--text); box-shadow: var(--shadow);
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+        }
+        .map-btn img { width: 40px; margin-bottom: 10px; }
+
+        /* Bottom Nav */
+        .bottom-nav {
+            position: fixed; bottom: 0; left: 0; width: 100%;
+            background: var(--white); padding: 15px;
+            display: flex; justify-content: space-around;
+            border-radius: 25px 25px 0 0;
+            box-shadow: 0 -4px 10px rgba(0,0,0,0.05);
+            z-index: 999;
+        }
+        .nav-item {
+            border: none; background: none; color: #ccc; font-size: 0.7rem;
+            display: flex; flex-direction: column; align-items: center; gap: 5px;
+        }
+        .nav-item.active { color: var(--accent); }
+        .nav-icon { font-size: 1.4rem; }
+
+        /* Floating Add Button */
+        .fab {
+            position: fixed; bottom: 90px; right: 20px;
+            background: var(--accent); color: white;
+            width: 50px; height: 50px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.5rem; box-shadow: 0 4px 10px rgba(229, 152, 155, 0.4);
+            border: none; cursor: pointer; z-index: 90;
+        }
+
+        /* Modal */
+        .modal {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center;
+        }
+        .modal-content {
+            background: white; width: 85%; padding: 25px; border-radius: 25px;
+        }
+        .close-btn { float: right; font-size: 1.5rem; cursor: pointer; }
+
+        .hidden { display: none; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="profile-pic" id="profilePic"></div>
+        <h1>屎忽 & 豬豬</h1>
+        <p class="subtitle">Seoul Trip 2026</p>
+        <div id="anniversary-msg" class="anniversary-badge hidden">✨ 1st Anniversary - Happy Day! ✨</div>
+    </header>
+
+    <div id="content-container" class="container">
+        
+        <div id="section-trip" class="section">
+            <div class="tabs">
+                <button class="tab-btn active" onclick="switchDay(1)">Day 1 (1/23)</button>
+                <button class="tab-btn" onclick="switchDay(2)">Day 2 (1/24)</button>
+                <button class="tab-btn" onclick="switchDay(3)">Day 3 (1/25)</button>
+                <button class="tab-btn" onclick="switchDay(4)">Day 4 (1/26)</button>
+            </div>
+
+            <div class="weather-card">
+                <div class="weather-info">
+                    <h3 id="current-date-display">Jan 23, 2026</h3>
+                    <p id="weather-text">預測: 晴天 -3°C ~ 2°C</p>
+                </div>
+                <div class="weather-icon" id="weather-emoji">☀️</div>
+            </div>
+
+            <ul class="itinerary-list" id="itinerary-list">
+                </ul>
+        </div>
+
+        <div id="section-money" class="section hidden">
+            <h2 style="font-size: 1.2rem; color: var(--text);">💰 分帳神器 (自動匯率)</h2>
+            <div class="money-card">
+                <div class="input-group">
+                    <input type="text" id="expense-item" placeholder="項目 (e.g. 烤肉)">
+                </div>
+                <div class="input-group">
+                    <input type="number" id="expense-amount" placeholder="金額 (KRW)">
+                    <select id="expense-payer">
+                        <option value="Shihu">屎忽付</option>
+                        <option value="Piggy">豬豬付</option>
+                    </select>
+                </div>
+                <button class="btn-calc" onclick="addExpense()">加入並計算</button>
+                <p class="exchange-rate">當前匯率設定: 1000 KRW = <span id="rate-display">5.8</span> HKD</p>
+            </div>
+
+            <div id="expense-list"></div>
+            
+            <div class="result-box">
+                <h3>結算:</h3>
+                <p id="final-split">目前兩清！</p>
+            </div>
+        </div>
+
+        <div id="section-map" class="section hidden">
+            <h2 style="font-size: 1.2rem; color: var(--text);">🗺️ 導航助手</h2>
+            <div class="map-grid">
+                <a href="https://map.naver.com" target="_blank" class="map-btn">
+                    <span style="font-size:2rem; margin-bottom:5px;">🇰🇷</span>
+                    <strong>Naver Map</strong>
+                    <span style="font-size:0.7rem; color:#888;">韓國最準</span>
+                </a>
+                <a href="https://www.google.com/maps" target="_blank" class="map-btn">
+                    <span style="font-size:2rem; margin-bottom:5px;">🌏</span>
+                    <strong>Google Map</strong>
+                    <span style="font-size:0.7rem; color:#888;">查店家評價</span>
+                </a>
+                <a href="https://www.subway.co.kr/" target="_blank" class="map-btn">
+                    <span style="font-size:2rem; margin-bottom:5px;">🚇</span>
+                    <strong>首爾地鐵</strong>
+                    <span style="font-size:0.7rem; color:#888;">路線查詢</span>
+                </a>
+                <a href="https://papago.naver.com/" target="_blank" class="map-btn">
+                    <span style="font-size:2rem; margin-bottom:5px;">🗣️</span>
+                    <strong>Papago</strong>
+                    <span style="font-size:0.7rem; color:#888;">即時翻譯</span>
+                </a>
+            </div>
+            
+            <div style="margin-top: 30px; text-align: center;">
+                <img src="https://placehold.co/200x200/FFB7C5/ffffff?text=LuLu+Map" style="border-radius: 20px; width: 100%; opacity: 0.8;">
+                <p style="font-size: 0.8rem; color: #888;">迷路的時候就問豬豬吧！</p>
+            </div>
+        </div>
+    </div>
+
+    <button class="fab" id="add-btn" onclick="openModal()">+</button>
+
+    <nav class="bottom-nav">
+        <button class="nav-item active" onclick="switchSection('trip', this)">
+            <span class="nav-icon">📅</span> 行程
+        </button>
+        <button class="nav-item" onclick="switchSection('money', this)">
+            <span class="nav-icon">💸</span> 分帳
+        </button>
+        <button class="nav-item" onclick="switchSection('map', this)">
+            <span class="nav-icon">🧭</span> 地圖
+        </button>
+    </nav>
+
+    <div id="itemModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal()">×</span>
+            <h3 id="modal-title">新增行程</h3>
+            <div class="input-group">
+                <input type="time" id="input-time">
+            </div>
+            <div class="input-group">
+                <input type="text" id="input-loc" placeholder="地點/活動">
+            </div>
+            <div class="input-group">
+                <input type="text" id="input-note" placeholder="備註 (e.g. 訂位代號)">
+            </div>
+            <button class="btn-calc" onclick="saveItem()">儲存</button>
+        </div>
+    </div>
+
+    <script>
+        // --- CONFIGURATION ---
+        const KRW_TO_HKD_RATE = 0.0058; // 匯率設定
+        const DATES = {
+            1: { date: '1月23日', w: '預測: 晴天 -4°C ~ 0°C', e: '🧣' },
+            2: { date: '1月24日', w: '預測: 多雲 -2°C ~ 3°C', e: '☁️' },
+            3: { date: '1月25日', w: '預測: 下雪 -5°C ~ 1°C', e: '❄️' }, // Anniversary Day
+            4: { date: '1月26日', w: '預測: 晴天 -3°C ~ 2°C', e: '✈️' }
+        };
+
+        // --- STATE ---
+        let currentDay = 1;
+        
+        // ** HERE IS THE ANNIVERSARY DEFAULT ITEM FOR DAY 3 **
+        let itineraryData = JSON.parse(localStorage.getItem('seoulItinerary')) || {
+            1: [], 
+            2: [], 
+            3: [{time: '19:00', location: '一週年紀念晚餐', note: '甜蜜蜜地慶祝吧！', completed: false}], 
+            4: []
+        };
+        // --------------------------------------------------------
+
+        let expenses = JSON.parse(localStorage.getItem('seoulExpenses')) || [];
+        let editIndex = -1; // -1 means adding new
+
+        // --- INIT ---
+        document.getElementById('rate-display').innerText = (KRW_TO_HKD_RATE * 1000).toFixed(1);
+        renderItinerary();
+        renderExpenses();
+        switchDay(1); // Ensure Day 1 is loaded correctly on start
+
+        // --- NAVIGATION ---
+        function switchSection(sectionId, btnElement) {
+            document.querySelectorAll('.section').forEach(el => el.classList.add('hidden'));
+            document.getElementById('section-' + sectionId).classList.remove('hidden');
+            
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+            btnElement.classList.add('active');
+
+            // Show/Hide FAB
+            document.getElementById('add-btn').style.display = sectionId === 'trip' ? 'flex' : 'none';
+        }
+
+        function switchDay(day) {
+            currentDay = day;
+            document.querySelectorAll('.tab-btn').forEach((btn, index) => {
+                btn.classList.toggle('active', index + 1 === day);
+            });
+            
+            // Update Weather UI
+            document.getElementById('current-date-display').innerText = DATES[day].date;
+            document.getElementById('weather-text').innerText = DATES[day].w;
+            document.getElementById('weather-emoji').innerText = DATES[day].e;
+
+            // Anniversary Check (1月25日 = Day 3)
+            const badge = document.getElementById('anniversary-msg');
+            const header = document.querySelector('header');
+            if (day === 3) {
+                badge.classList.remove('hidden');
+                header.style.background = "var(--secondary)"; // 淺粉色背景更突出
+            } else {
+                badge.classList.add('hidden');
+                header.style.background = "var(--white)";
+            }
+
+            renderItinerary();
+        }
+
+        // --- ITINERARY LOGIC ---
+        function renderItinerary() {
+            const list = document.getElementById('itinerary-list');
+            list.innerHTML = '';
+            const items = itineraryData[currentDay];
+
+            // Sort by time
+            items.sort((a, b) => a.time.localeCompare(b.time));
+
+            items.forEach((item, index) => {
+                const li = document.createElement('li');
+                li.className = `itinerary-item ${item.completed ? 'completed' : ''}`;
+                li.innerHTML = `
+                    <div class="checkbox-wrapper">
+                        <div class="custom-checkbox ${item.completed ? 'checked' : ''}" onclick="toggleComplete(${index})"></div>
+                    </div>
+                    <div class="time">${item.time}</div>
+                    <div class="details">
+                        <h3>${item.location}</h3>
+                        <p>${item.note || ''}</p>
+                    </div>
+                    <div class="actions">
+                        <button class="action-btn" onclick="editItem(${index})">✏️</button>
+                        <button class="action-btn" onclick="deleteItem(${index})">🗑️</button>
+                    </div>
+                `;
+                list.appendChild(li);
+            });
+        }
+
+        function toggleComplete(index) {
+            itineraryData[currentDay][index].completed = !itineraryData[currentDay][index].completed;
+            saveData();
+            renderItinerary();
+        }
+
+        function openModal() {
+            document.getElementById('itemModal').style.display = 'flex';
+            document.getElementById('modal-title').innerText = '新增行程';
+            document.getElementById('input-time').value = '';
+            document.getElementById('input-loc').value = '';
+            document.getElementById('input-note').value = '';
+            editIndex = -1;
+        }
+
+        function editItem(index) {
+            const item = itineraryData[currentDay][index];
+            document.getElementById('itemModal').style.display = 'flex';
+            document.getElementById('modal-title').innerText = '編輯行程';
+            document.getElementById('input-time').value = item.time;
+            document.getElementById('input-loc').value = item.location;
+            document.getElementById('input-note').value = item.note;
+            editIndex = index;
+        }
+
+        function closeModal() {
+            document.getElementById('itemModal').style.display = 'none';
+        }
+
+        function saveItem() {
+            const time = document.getElementById('input-time').value;
+            const loc = document.getElementById('input-loc').value;
+            const note = document.getElementById('input-note').value;
+
+            if (!time || !loc) return alert('請輸入時間和地點！');
+
+            if (editIndex === -1) {
+                // Add New
+                itineraryData[currentDay].push({ time, location: loc, note, completed: false });
+            } else {
+                // Edit Existing
+                itineraryData[currentDay][editIndex].time = time;
+                itineraryData[currentDay][editIndex].location = loc;
+                itineraryData[currentDay][editIndex].note = note;
+            }
+
+            saveData();
+            closeModal();
+            renderItinerary();
+        }
+
+        function deleteItem(index) {
+            if(confirm('確定要刪除這個行程嗎？')) {
+                itineraryData[currentDay].splice(index, 1);
+                saveData();
+                renderItinerary();
+            }
+        }
+
+        function saveData() {
+            localStorage.setItem('seoulItinerary', JSON.stringify(itineraryData));
+        }
+
+        // --- EXPENSE LOGIC ---
+        function addExpense() {
+            const item = document.getElementById('expense-item').value;
+            const krw = parseFloat(document.getElementById('expense-amount').value);
+            const payer = document.getElementById('expense-payer').value;
+
+            if (!item || isNaN(krw)) return alert('請輸入正確資料');
+
+            const hkd = krw * KRW_TO_HKD_RATE;
+            expenses.push({ item, krw, hkd, payer });
+            
+            localStorage.setItem('seoulExpenses', JSON.stringify(expenses));
+            
+            document.getElementById('expense-item').value = '';
+            document.getElementById('expense-amount').value = '';
+            renderExpenses();
+        }
+
+        function renderExpenses() {
+            const list = document.getElementById('expense-list');
+            list.innerHTML = '';
+            
+            let shihuPaid = 0;
+            let piggyPaid = 0;
+
+            expenses.forEach((exp, idx) => {
+                const div = document.createElement('div');
+                div.style.cssText = "display:flex; justify-content:space-between; padding:10px; border-bottom:1px solid #eee; font-size:0.9rem;";
+                div.innerHTML = `
+                    <span>${exp.item} (${exp.payer === 'Shihu' ? '屎忽' : '豬豬'})</span>
+                    <span>₩${exp.krw.toLocaleString()} <br><small style='color:#888'>$${exp.hkd.toFixed(1)} HKD</small></span>
+                    <span style="color:red; cursor:pointer; margin-left:10px;" onclick="removeExpense(${idx})">x</span>
+                `;
+                list.appendChild(div);
+
+                if (exp.payer === 'Shihu') shihuPaid += exp.hkd;
+                else piggyPaid += exp.hkd;
+            });
+
+            // Calculation Logic
+            const total = shihuPaid + piggyPaid;
+            const split = total / 2;
+            const diff = shihuPaid - split; // + means Shihu paid more, - means Piggy paid more
+
+            const resultEl = document.getElementById('final-split');
+            if (Math.abs(diff) < 1) {
+                resultEl.innerText = "目前兩清！太棒了！";
+                resultEl.style.color = "green";
+            } else if (diff > 0) {
+                resultEl.innerText = `豬豬 要給 屎忽: $${diff.toFixed(1)} HKD`;
+                resultEl.style.color = "var(--accent)";
+            } else {
+                resultEl.innerText = `屎忽 要給 豬豬: $${Math.abs(diff).toFixed(1)} HKD`;
+                resultEl.style.color = "var(--accent)";
+            }
+        }
+
+        function removeExpense(index) {
+            if(confirm('刪除這筆帳？')) {
+                expenses.splice(index, 1);
+                localStorage.setItem('seoulExpenses', JSON.stringify(expenses));
+                renderExpenses();
+            }
+        }
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            if (event.target == document.getElementById('itemModal')) {
+                closeModal();
+            }
+        }
+    </script>
+</body>
+</html>
